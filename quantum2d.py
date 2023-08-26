@@ -465,9 +465,10 @@ def get_conferences_cluster_sort(dc:pd.DataFrame, cl:int):
     """
     dg = dc[dc['paper_cluster'] == cl].copy()
     print(cl)
-    dv = dg[dg['source_type'] == 'conference'].groupby(['source'])['paper_cluster_score'].sum().to_frame()
+    dv = dg[dg['source_type'] == 'conference'].groupby(['source','landing_page_url'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
-    dv['conference'] = dv.index
+    #dv['conference'] = dv.index
+    dv.reset_index(inplace=True)
     kw = centroids[centroids.cluster == cl]['keywords'].iloc[0]
     return dv, kw
 
@@ -562,10 +563,18 @@ with tab4:
     
 with tab5:
     st.write("Conferences most representative of this cluseter")
-    st.dataframe(
-        dvconferences[['conference','paper_cluster_score']],
+    st.data_editor(
+        dvconferences,
+        column_config={
+            "landing_page_url": st.column_config.LinkColumn("landing_page_url")
+        },
         hide_index=True
     )
+  #  st.dataframe(
+      #  dvconferences[['conference','paper_cluster_score','landing_page_url']],
+  #      dvconferences,
+  #      hide_index=True
+  #  )
     
 # https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9266366
 
