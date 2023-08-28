@@ -449,7 +449,7 @@ def get_journals_cluster_sort(dc:pd.DataFrame, cl:int):
     """
     dg = dc[dc['paper_cluster'] == cl].copy()
     print(cl)
-    dv = dg[dg['source_type'] == 'journal'].groupby(['source','landing_page_url'])['paper_cluster_score'].sum().to_frame()
+    dv = dg[dg['source_type'] == 'journal'].groupby(['source'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
    # dv['journal'] = dv.index
     dv.reset_index(inplace=True)
@@ -466,7 +466,7 @@ def get_conferences_cluster_sort(dc:pd.DataFrame, cl:int):
     """
     dg = dc[dc['paper_cluster'] == cl].copy()
     print(cl)
-    dv = dg[dg['source_type'] == 'conference'].groupby(['source','landing_page_url'])['paper_cluster_score'].sum().to_frame()
+    dv = dg[dg['source_type'] == 'conference'].groupby(['source'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
     #dv['conference'] = dv.index
     dv.reset_index(inplace=True)
