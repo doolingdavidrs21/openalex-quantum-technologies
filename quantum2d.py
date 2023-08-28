@@ -557,7 +557,7 @@ with tab3:
 with tab4:
     st.write("Journals most representative of this cluster")
     st.data_editor(
-        dvconferences,
+        dvjournals,
         column_config={
             "landing_page_url": st.column_config.LinkColumn("landing_page_url")
         },
