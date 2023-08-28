@@ -469,9 +469,9 @@ def get_conferences_cluster_sort(dc:pd.DataFrame, cl:int):
     dv = dg[dg['source_type'] == 'conference'].groupby(['source'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
     dv['conference'] = dv.index
-    dv.reset_index(inplace=True)
     kw = centroids[centroids.cluster == cl]['keywords'].iloc[0]
     return dv, kw
+
 
 
 def get_country_collaborations_sort(dc:pd.DataFrame, cl:int):
@@ -506,7 +506,6 @@ def get_time_series(dg, cl:int):
     #by_month.index = pd.PeriodIndex(by_month.index)
     #df_month = by_month.rename_axis('month').reset_index(name='counts')
     return dftime
-
 
 
 tab1, tab2, tab3, tab4 , tab5, tab6, tab7, tab8= st.tabs(["Countries", "Affiliations", "Authors",
@@ -555,14 +554,7 @@ with tab3:
     )
     
 with tab4:
-    st.write("Journals most representative of this cluster")
-    #st.data_editor(
-    #    dvjournals,
-    #    column_config={
-    #        "landing_page_url": st.column_config.LinkColumn("landing_page_url")
-    #    },
-    #    hide_index=True
-    #)
+    st.write("Journals most representative of this cluseter")
     st.dataframe(
         dvjournals[['journal','paper_cluster_score']],
         hide_index=True
@@ -570,17 +562,9 @@ with tab4:
 
     
 with tab5:
-    st.write("Conferences most representative of this cluster")
-    #st.data_editor(
-    #    dvconferences,
-    #    column_config={
-    #        "landing_page_url": st.column_config.LinkColumn("landing_page_url")
-    #    },
-    #    hide_index=True
-    #)
+    st.write("Conferences most representative of this cluseter")
     st.dataframe(
         dvconferences[['conference','paper_cluster_score']],
-        dvconferences,
         hide_index=True
     )
     
