@@ -556,33 +556,33 @@ with tab3:
     
 with tab4:
     st.write("Journals most representative of this cluster")
-    st.data_editor(
-        dvjournals,
-        column_config={
-            "landing_page_url": st.column_config.LinkColumn("landing_page_url")
-        },
-        hide_index=True
-    )
-    #st.dataframe(
-    #    dvjournals[['journal','paper_cluster_score']],
+    #st.data_editor(
+    #    dvjournals,
+    #    column_config={
+    #        "landing_page_url": st.column_config.LinkColumn("landing_page_url")
+    #    },
     #    hide_index=True
     #)
+    st.dataframe(
+        dvjournals[['journal','paper_cluster_score']],
+        hide_index=True
+    )
 
     
 with tab5:
     st.write("Conferences most representative of this cluster")
-    st.data_editor(
+    #st.data_editor(
+    #    dvconferences,
+    #    column_config={
+    #        "landing_page_url": st.column_config.LinkColumn("landing_page_url")
+    #    },
+    #    hide_index=True
+    #)
+    st.dataframe(
+        dvconferences[['conference','paper_cluster_score']],
         dvconferences,
-        column_config={
-            "landing_page_url": st.column_config.LinkColumn("landing_page_url")
-        },
         hide_index=True
     )
-  #  st.dataframe(
-      #  dvconferences[['conference','paper_cluster_score','landing_page_url']],
-  #      dvconferences,
-  #      hide_index=True
-  #  )
     
 # https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9266366
 
