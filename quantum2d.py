@@ -451,7 +451,7 @@ def get_journals_cluster_sort(dc:pd.DataFrame, cl:int):
     print(cl)
     dv = dg[dg['source_type'] == 'journal'].groupby(['source'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
-   # dv['journal'] = dv.index
+    dv['journal'] = dv.index
     dv.reset_index(inplace=True)
     kw = centroids[centroids.cluster == cl]['keywords'].iloc[0]
     return dv, kw
@@ -468,7 +468,7 @@ def get_conferences_cluster_sort(dc:pd.DataFrame, cl:int):
     print(cl)
     dv = dg[dg['source_type'] == 'conference'].groupby(['source'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
-    #dv['conference'] = dv.index
+    dv['conference'] = dv.index
     dv.reset_index(inplace=True)
     kw = centroids[centroids.cluster == cl]['keywords'].iloc[0]
     return dv, kw
