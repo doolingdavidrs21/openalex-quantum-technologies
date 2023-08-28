@@ -449,9 +449,10 @@ def get_journals_cluster_sort(dc:pd.DataFrame, cl:int):
     """
     dg = dc[dc['paper_cluster'] == cl].copy()
     print(cl)
-    dv = dg[dg['source_type'] == 'journal'].groupby(['source'])['paper_cluster_score'].sum().to_frame()
+    dv = dg[dg['source_type'] == 'journal'].groupby(['source','landing_page_url'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
-    dv['journal'] = dv.index
+   # dv['journal'] = dv.index
+    dv.reset_index(inplace=True)
     kw = centroids[centroids.cluster == cl]['keywords'].iloc[0]
     return dv, kw
 
@@ -554,15 +555,22 @@ with tab3:
     )
     
 with tab4:
-    st.write("Journals most representative of this cluseter")
-    st.dataframe(
-        dvjournals[['journal','paper_cluster_score']],
+    st.write("Journals most representative of this cluster")
+    st.data_editor(
+        dvconferences,
+        column_config={
+            "landing_page_url": st.column_config.LinkColumn("landing_page_url")
+        },
         hide_index=True
     )
+    #st.dataframe(
+    #    dvjournals[['journal','paper_cluster_score']],
+    #    hide_index=True
+    #)
 
     
 with tab5:
-    st.write("Conferences most representative of this cluseter")
+    st.write("Conferences most representative of this cluster")
     st.data_editor(
         dvconferences,
         column_config={
