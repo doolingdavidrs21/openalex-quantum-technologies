@@ -10,6 +10,7 @@ import igraph as ig
 from streamlit_plotly_events import plotly_events
 import math
 import plotly.io as pio
+import pickle
 #pio.templates.default = "plotly"  
 # https://towardsdatascience.com/how-to-deploy-interactive-pyvis-network-graphs-on-streamlit-6c401d4c99db
 pio.templates.default = "plotly_dark"
@@ -53,7 +54,11 @@ def load_dfinfo_asat():
 #    dg = pd.read_pickle('asatgeo.pkl')
 #    return dg
 
-
+@st.cache_data()
+def load_source_dict():
+    with open("source_page_dict.pkl", "rb") as f:
+        source_dict = pickle.load(f)
+    return source_dict
 
 
 
@@ -62,6 +67,7 @@ dftriple = load_dftriple_asat()
 dfinfo = load_dfinfo_asat()
 dfinfo['cluster_'] = dfinfo["cluster"].apply(str)
 #dfgeo = load_dfgeo_asat()
+source_dict = load_source_dict()
 
 kw_dict = dfinfo['keywords'].to_dict()
 
@@ -452,9 +458,9 @@ def get_journals_cluster_sort(dc:pd.DataFrame, cl:int):
     dv = dg[dg['source_type'] == 'journal'].groupby(['source'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
     dv['journal'] = dv.index
-    dv.reset_index(inplace=True)
+    dv['homepage_url'] = dv['journal'].map(source_dict)
     kw = centroids[centroids.cluster == cl]['keywords'].iloc[0]
-    return dv, kw
+    return dv[['journal','homepage_url','paper_cluster_score']], kw
 
 
 def get_conferences_cluster_sort(dc:pd.DataFrame, cl:int):
@@ -469,9 +475,9 @@ def get_conferences_cluster_sort(dc:pd.DataFrame, cl:int):
     dv = dg[dg['source_type'] == 'conference'].groupby(['source'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
     dv['conference'] = dv.index
+   # dv['homepage_url'] = dv['conference'].map(source_dict)
     kw = centroids[centroids.cluster == cl]['keywords'].iloc[0]
     return dv, kw
-
 
 
 def get_country_collaborations_sort(dc:pd.DataFrame, cl:int):
@@ -535,7 +541,7 @@ with tab1:
     st.dataframe(dc)
 with tab2:
     st.markdown("highlight and click a value in the **id** column to be given more information")
-    st.data_editor(
+    st.dataframe(
         dvaffils,
         column_config={
             "id": st.column_config.LinkColumn("id"),
@@ -545,7 +551,7 @@ with tab2:
     #st.dataframe(dvaffils)
 with tab3:
     st.write("highlight and click a value in the **paper_author_id** to be given more information")
-    st.data_editor(
+    st.dataframe(
         dvauthor,
         column_config={
             "paper_author_id": st.column_config.LinkColumn("paper_author_id")
@@ -554,19 +560,33 @@ with tab3:
     )
     
 with tab4:
-    st.write("Journals most representative of this cluseter")
+    st.write("Journals most representative of this cluster")
+   # st.dataframe(
+   #     dvjournals[['journal','paper_cluster_score']],
+   #     hide_index=True
+   # )
     st.dataframe(
-        dvjournals[['journal','paper_cluster_score']],
-        hide_index=True
+        dvjournals,
+        column_config={
+            "homepage_url": st.column_config.LinkColumn("homepage_url")
+        },
+        hide_index=True,
     )
 
     
 with tab5:
-    st.write("Conferences most representative of this cluseter")
+    st.write("Conferences most representative of this cluster")
     st.dataframe(
         dvconferences[['conference','paper_cluster_score']],
         hide_index=True
     )
+  #  st.data_editor(
+  #      dvconferences,
+  #      column_config={
+  #          "homepage_url": st.column_config.LinkColumn("homepage_url")
+  #      },
+  #      hide_index=True,
+  #  )
     
 # https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9266366
 
@@ -576,7 +596,7 @@ with tab6:
     
 with tab7:
     st.write("Country-Country Collaborations")
-    st.data_editor(
+    st.dataframe(
         dfcollab[['x', 'y', 'id','collab_countries', 'title', 'doi', 'cluster', 'probability',
        'publication_date', 'keywords', 'top_concepts', 'affil_list',
        'author_list','funder_list']],
