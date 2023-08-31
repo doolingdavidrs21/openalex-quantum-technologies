@@ -657,31 +657,34 @@ with tab8:
 with tab9:
     dg = dvaffils.copy()
     dg = dg.dropna(subset=["longitude","latitude"])
+    dg['size'] = 100*dg['paper_cluster_score']
     dg = pd.read_json(dg.to_json())
 
     mean_lat = dg['latitude'].mean()
     st.write(dg.head())
     mean_lon = dg['longitude'].mean()
     cl_initial_view = pdk.ViewState(
-        latitude = dg['latitude'].iloc[0],
-        longitude = dg['longitude'].iloc[0],
+        latitude = mean_lat,
+        longitude = mean_lon,
         zoom = 11
     )
     sp_layer = pdk.Layer(
         'ScatterplotLayer',
         data = dg,
         get_position = ['longitude','latitude'],
-        radius_scale = 6,
-        radius_min_pixels=10,
-        radius_max_pixels=25,
+        radius_scale = 75,
+        radius_min_pixels=5,
+      #  radius_max_pixels=300,
         line_width_min_pixels=1,
-        get_radius = 300,
+       # get_radius = 300,
+        get_radius = "size",
         pickable=True,
         opacity = 0.4,
-        get_fill_color = [198, 'paper_cluster_score > 1 ? 115 * paper_cluster_score : -155 * paper_cluster_score', 'paper_cluster_score > 3 ? 55 * paper_cluster_score : -55 * paper_cluser_score']
+      #  get_fill_color = ['paper_cluster_score <= 1 ? 255 ? 
+        get_fill_color = [65, 182, 196]
     )
     st.pydeck_chart(pdk.Deck(
-        map_style='light',
+        map_style='dark',
         initial_view_state = cl_initial_view,
         layers = [sp_layer],
         tooltip = {
