@@ -436,7 +436,7 @@ def get_affils_cluster_sort(dc:pd.DataFrame, cl:int):
                      'type'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
     dv.reset_index(inplace=True) # map the display_name column with the geo_dict to get lattitude, longitude
-    dv['latitutude'] = dv['display_name'].apply(lambda x: affil_geo_dict.get(x, (None, None))[0])
+    dv['latitude'] = dv['display_name'].apply(lambda x: affil_geo_dict.get(x, (None, None))[0])
     dv['longitude'] = dv['display_name'].apply(lambda x: affil_geo_dict.get(x, (None, None))[1])
     kw = centroids[centroids.cluster == cl]['keywords'].iloc[0]
     return dv, kw
@@ -526,10 +526,35 @@ def get_time_series(dg, cl:int):
     return dftime
 
 
-tab1, tab2, tab3, tab4 , tab5, tab6, tab7, tab8= st.tabs(["Countries", "Affiliations", "Authors",
+
+def get_pydeck_chart(dh:pd.DataFrame):
+    """
+    takes the dataframe dg (dvaffils)
+    and returns a pydeck chart
+    """
+    dg = dh.copy()
+    dg = dg.dropna(subset=["longitude","latitude"])
+    dg = pd.read_json(dg.to_json())
+
+    mean_lat = dg['latitude'].mean()
+    mean_lon = dg['longitude'].mean()
+    cl_initial_view = pdk.ViewState(
+        latitude = dg['latitude'].iloc[0],
+        longitude = dg['longitude'].iloc[0],
+        zoom = 11
+    )
+    sp_layer = pdk.Layer(
+        'ScatterplotLayer',
+        data = dg,
+        get_position = ['longitude','latitude'],
+        get_radius = 300
+    )
+    return cl_initial_view, sp_layer
+
+tab1, tab2, tab3, tab4 , tab5, tab6, tab7, tab8, tab9= st.tabs(["Countries", "Affiliations", "Authors",
                                         "Journals","Conferences",
  "Coauthorship Graph", "Country-Country Collaborations",
-                    "time evolution of topic"])
+                    "time evolution of topic","Affiliation Map"])
 
 dvauthor, kwwuathor = get_author_cluster_sort(dftriple, selected_cluster)
 #st.dataframe(dvauthor)
@@ -627,3 +652,39 @@ with tab8:
         color='key:N'
     ).interactive()
     st.altair_chart(alt_chart, use_container_width=True)
+    
+    
+with tab9:
+    dg = dvaffils.copy()
+    dg = dg.dropna(subset=["longitude","latitude"])
+    dg = pd.read_json(dg.to_json())
+
+    mean_lat = dg['latitude'].mean()
+    st.write(dg.head())
+    mean_lon = dg['longitude'].mean()
+    cl_initial_view = pdk.ViewState(
+        latitude = dg['latitude'].iloc[0],
+        longitude = dg['longitude'].iloc[0],
+        zoom = 11
+    )
+    sp_layer = pdk.Layer(
+        'ScatterplotLayer',
+        data = dg,
+        get_position = ['longitude','latitude'],
+        radius_scale = 6,
+        radius_min_pixels=10,
+        radius_max_pixels=25,
+        line_width_min_pixels=1,
+        get_radius = 300,
+        pickable=True,
+        opacity = 0.4,
+        get_fill_color = [198, 115, 255]
+    )
+    st.pydeck_chart(pdk.Deck(
+        map_style='light',
+        initial_view_state = cl_initial_view,
+        layers = [sp_layer],
+        tooltip = {
+            "text": "{display_name}"
+        }
+    ))
