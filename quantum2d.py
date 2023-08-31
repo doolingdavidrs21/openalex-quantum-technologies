@@ -11,6 +11,7 @@ from streamlit_plotly_events import plotly_events
 import math
 import plotly.io as pio
 import pickle
+import pydeck as pdk
 #pio.templates.default = "plotly"  
 # https://towardsdatascience.com/how-to-deploy-interactive-pyvis-network-graphs-on-streamlit-6c401d4c99db
 pio.templates.default = "plotly_dark"
@@ -61,6 +62,13 @@ def load_source_dict():
     return source_dict
 
 
+@st.cache_data()
+def load_affil_geo_dict():
+    with open("affil_geo_dict.pkl", "rb") as f:
+        affil_geo_dict = pickle.load(f)
+    return affil_geo_dict
+
+
 
 centroids = load_centroids_asat()
 dftriple = load_dftriple_asat()
@@ -68,6 +76,7 @@ dfinfo = load_dfinfo_asat()
 dfinfo['cluster_'] = dfinfo["cluster"].apply(str)
 #dfgeo = load_dfgeo_asat()
 source_dict = load_source_dict()
+affil_geo_dict = load_affil_geo_dict()
 
 kw_dict = dfinfo['keywords'].to_dict()
 
@@ -420,12 +429,15 @@ def get_affils_cluster_sort(dc:pd.DataFrame, cl:int):
     and returns the results grouped by id, ror sorted
     by the some of probablity descending
     """
+    # https://learning.oreilly.com/library/view/streamlit-for-data/9781803248226/text/ch004.xhtml
     dg = dc[dc['paper_cluster'] == cl].copy()
     print(cl)
     dv = dg.groupby(['id','display_name','country_code',
                      'type'])['paper_cluster_score'].sum().to_frame()
     dv.sort_values('paper_cluster_score', ascending=False, inplace=True)
-    dv.reset_index(inplace=True)
+    dv.reset_index(inplace=True) # map the display_name column with the geo_dict to get lattitude, longitude
+    dv['latitutude'] = dv['display_name'].apply(lambda x: affil_geo_dict.get(x, (None, None))[0])
+    dv['longitude'] = dv['display_name'].apply(lambda x: affil_geo_dict.get(x, (None, None))[1])
     kw = centroids[centroids.cluster == cl]['keywords'].iloc[0]
     return dv, kw
 
