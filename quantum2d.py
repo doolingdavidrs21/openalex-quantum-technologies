@@ -678,7 +678,7 @@ with tab9:
         get_radius = 300,
         pickable=True,
         opacity = 0.4,
-        get_fill_color = [198, 115, 255]
+        get_fill_color = [198, 'paper_cluster_score > 1 ? 115 * paper_cluster_score : -155 * paper_cluster_score', 'paper_cluster_score > 3 ? 55 * paper_cluster_score : -55 * paper_cluser_score']
     )
     st.pydeck_chart(pdk.Deck(
         map_style='light',
