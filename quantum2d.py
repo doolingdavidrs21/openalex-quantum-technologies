@@ -685,6 +685,6 @@ with tab9:
         initial_view_state = cl_initial_view,
         layers = [sp_layer],
         tooltip = {
-            "text": "{display_name}"
+            "html": "<b>{display_name}</b> <br/> <b>Strength</b>: {paper_cluster_score}"
         }
     ))
