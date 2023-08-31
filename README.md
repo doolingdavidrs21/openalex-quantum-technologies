@@ -6,6 +6,7 @@ First run the notebook **quantum2d.ipynb** to create the data files:
 * quantumdfinfo2d.pkl
 * quantumdftriple2d.pkl
 * source_page_dict.pkl
+* affil_geo_dict.pkl
 
 Compress the first three with
 
