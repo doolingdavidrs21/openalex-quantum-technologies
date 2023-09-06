@@ -296,7 +296,7 @@ const options = {
 
 st.dataframe(centroids[['cluster','x','y','concepts','keywords']])
 
-@st.cache_data()
+#@st.cache_data()
 def get_fig_asat():
     fig_centroids = px.scatter(centroids[centroids.cluster != -1],
                            x='x',y='y',
