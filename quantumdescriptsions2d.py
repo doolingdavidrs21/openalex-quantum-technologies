@@ -497,11 +497,12 @@ try:
     st.write(llm_article_description)
 #st.write(topic_keywords)
 except:
-    df_selected_centroid = centroids[
-        (centroids["x"] == selected_x_value)
-        & (centroids["y"] == selected_y_value)
-    ]
-    selected_cluster = df_selected_centroid['cluster'].iloc[0]
+    pass
+    #df_selected_centroid = centroids[
+    #    (centroids["x"] == selected_x_value)
+    #    & (centroids["y"] == selected_y_value)
+    #]
+    #selected_cluster = df_selected_centroid['cluster'].iloc[0]
 
 
 #def make_clickable(url, name):
