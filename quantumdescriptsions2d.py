@@ -18,7 +18,7 @@ from langchain import PromptTemplate
 from langchain.chains import LLMChain
 
 
-## openai_key = "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"
+
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 # https://docs.streamlit.io/streamlit-community-cloud/deploy-your-app/secrets-management
 llm = OpenAI(model_name = 'gpt-4',
